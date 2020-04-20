@@ -12,3 +12,5 @@ ios_bgp_peers:
 ios_bgp_networks: 
   - prefix: 9.9.9.9
     masklen: 32
+
+interface_config: []
