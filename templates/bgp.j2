@@ -1,0 +1,13 @@
+router bgp {{ ios_bgp_as }}
+ bgp log-neighbor-changes
+ {% for neighbor in ios_bgp_neighbors %}
+  neighbor {{ neighbor.address }} remote-as {{ neighbor.as }}
+ {% endfor %}
+ !
+ address-family ipv4
+  {% for network in ios_bgp_networks %}
+   network {{ network.network }} mask {{ network.mask }}
+  {% endfor %}
+  {% for neighbor in ios_bgp_neighbors %}
+   neighbor {{ neighbor.address }} activate
+  {% endfor %}

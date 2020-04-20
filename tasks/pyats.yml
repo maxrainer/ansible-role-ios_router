@@ -1,0 +1,42 @@
+---
+# test BGP table has min. 2 entries
+#
+
+- name: "delay testing for {{ ios_test_delay }}s"
+  wait_for:
+    timeout: "{{ ios_test_delay }}"
+  tags: [always]
+
+- name: Read in parse_genie role
+  include_role:
+    name: clay584.parse_genie
+  tags: [always]
+
+- name: get 'show ip bgp'
+  ios_command:
+    commands: show ip bgp
+  register: bgp_output
+  tags: [always]
+
+- name: parse bgp routing stdout
+  set_fact:
+    ip_bgp: "{{ bgp_output['stdout'][0] | parse_genie(command='show ip bgp', os='ios') }}"
+  tags: [always]
+
+- name: workaround empty dict in genie parser
+  set_fact:
+    ip_bgp: "{{ ip_bgp.vrf.default.address_family | dict2items }}"
+  tags: [always]
+
+- name: Print Structured Data
+  debug:
+    msg: "{{ ip_bgp[0].value }}"
+    verbosity: 2
+  delegate_to: localhost
+  tags: [always]
+
+- name: "fail if prefix is missing in BGP table"
+  fail:
+    msg: "found <2 prefixes in BGP table"
+  when: ip_bgp[0].value.routes | length < 2
+  tags: [always]

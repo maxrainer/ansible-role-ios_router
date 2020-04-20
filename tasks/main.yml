@@ -1,0 +1,16 @@
+--- 
+
+- include_tasks: facts.yml
+  tags: [facts, never]
+
+- include_tasks: interface.yml
+  tags: [interface, never]
+
+- include_tasks: bgp.yml
+  tags: [bgp, never]
+
+- include_tasks: pyats.yml
+  tags: [pyats, never]
+
+- include_tasks: genie_generic.yml
+  tags: [genie, never]

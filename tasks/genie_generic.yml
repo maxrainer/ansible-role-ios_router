@@ -1,0 +1,28 @@
+---
+
+- name: "delay testing for {{ ios_test_delay }}s"
+  wait_for:
+    timeout: "{{ ios_test_delay }}"
+  tags: [always]
+
+- name: Read in parse_genie role
+  include_role:
+    name: clay584.parse_genie
+  tags: [always]
+
+- name: "get CLI command: {{ ios_genie_generic_command }}"
+  ios_command:
+    commands: "{{ ios_genie_generic_command }}"
+  register: genie_output
+  tags: [always]
+
+- name: "parse output with genie" 
+  set_fact:
+    structured_data: "{{ genie_output['stdout'][0] | parse_genie(command=ios_genie_generic_command, os='ios') }}"
+  tags: [always]
+
+- name: print structured data
+  debug:
+    msg: "{{ structured_data }}"
+  delegate_to: localhost
+  tags: [always]

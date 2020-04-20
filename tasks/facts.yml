@@ -1,0 +1,14 @@
+---
+# facts.yml
+
+- name: gather facts from IOS device
+  ios_facts: 
+    gather_subset: all
+  register: iosfacts
+  tags: facts
+
+- name: facts collected
+  debug:
+   msg: "{{ iosfacts }}"
+   verbosity: 2 
+  tags: facts

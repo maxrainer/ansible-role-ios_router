@@ -1,0 +1,61 @@
+---
+
+- name: Interface IPv4 Addresses
+  ios_l3_interfaces: 
+    config: 
+      - name: "{{ item.name }}"
+        ipv4: 
+        - address: "{{ item.ipv4.address }}"
+    state: merged
+  loop: "{{ interface_config }}"
+  register: _int_l3
+  notify: save config
+  tags: [always, config]
+
+- name: debug Layer 3 Interface result 
+  debug:
+    msg: "{{ _int_l3 }}"
+    verbosity: 2
+  tags: [always, config]
+
+- name: Interface description and bring 'up'
+  ios_interfaces:
+    config: 
+      - name: "{{ item.name }}"
+        description: "{{ item.description }}"
+        enabled: "{{ item.enabled }}"
+    state: merged
+  loop: "{{ interface_config }}"
+  notify: save config
+  register: _int_descr
+  tags: [always, config]
+
+- name: debug IOS Interface result 
+  debug:
+    msg: "{{ _int_descr }}"
+    verbosity: 2
+  tags: [always, config]
+
+- name: IOS ping neighbour Router (smoke tested)
+  ios_ping:
+    dest: "{{ item }}"
+    count: 2
+  loop: "{{ ping_destinations }}"
+  register: _ping
+  until: not _ping.failed
+  delay: 2
+  retries: 10
+  tags: [always, config]
+
+- name: rollback interface config
+  ios_config:
+    lines: "default interface {{ item.name }}"
+  loop: "{{ interface_config }}"
+  register: _int_rollback
+  tags: [never, rollback]
+
+- name: debug IOS Interface rollback 
+  debug:
+    msg: "{{ _int_rollback }}"
+    verbosity: 2
+  tags: [never, rollback]

@@ -1,0 +1,21 @@
+---
+
+dependencies: 
+  - src: clay584.parse_genie
+
+galaxy_info:
+  role_name: ios_router
+  author: Markus Rainer
+  description: Cisco IOS Router role for Demo and Labs
+  company: Red Hat
+
+  license: MIT
+
+  min_ansible_version: 2.9
+
+  platforms: 
+    - name: GenericUNIX
+      versions:
+        - all
+
+  galaxy_tags: [cisco, ios, demo, lab, networking]

@@ -1,0 +1,76 @@
+---
+# bgp.yml
+
+- name: configure global BGP neighbors
+  ios_bgp:
+    config: 
+      bgp_as: "{{ ios_bgp_as }}"
+      neighbors: 
+        - neighbor: "{{ item }}"
+          remote_as: "{{ ios_bgp_as }}"
+    operation: merge
+  loop: "{{ ios_bgp_peers }}"
+  register: _bgp_global_neighbors
+  tags: [bgp, config]
+
+- name: debug BGP global neigbors
+  debug: 
+    msg: "{{ _bgp_global_neighbors }}"
+    verbosity: 2
+  tags: [bgp, config]
+
+- name: configure IPv4 family BGP neighbors
+  ios_bgp:
+    config:
+      bgp_as: "{{ ios_bgp_as }}"
+      address_family:
+        - afi: ipv4
+          safi: unicast
+          neighbors:
+            - neighbor: "{{ item }}"
+              activate: "yes"
+    operation: merge
+  loop: "{{ ios_bgp_peers }}"
+  register: _bgp_neighbors
+  tags: [bgp, config]
+
+- name: debug BGP neigbors
+  debug: 
+    msg: "{{ _bgp_neighbors }}"
+    verbosity: 2
+  tags: [bgp, config]
+
+- name: configure BGP networks
+  ios_bgp:
+    config:
+      bgp_as: "{{ ios_bgp_as }}"
+      address_family:
+        - afi: ipv4
+          safi: unicast
+          networks:
+            - prefix: "{{ item.prefix }}" 
+              masklen: "{{ item.masklen }}"
+    operation: merge
+  loop: "{{ ios_bgp_networks }}"
+  register: _bgp_networks
+  tags: [bgp, config]
+
+- name: debug BGP networks
+  debug: 
+    msg: "{{ _bgp_networks }}"
+    verbosity: 2
+  tags: [bgp, config]
+
+- name: rollback BGP config
+  ios_bgp:
+    config:
+      bgp_as: "{{ ios_bgp_as }}"
+    operation: delete
+  register: _bgp_rollback 
+  tags: [never, rollback]
+
+- name: debug BGP rollback
+  debug: 
+    msg: "{{ _bgp_rollback }}"
+    verbosity: 2
+  tags: [never, rollback]

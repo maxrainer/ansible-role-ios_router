@@ -1,0 +1,14 @@
+---
+
+ios_bgp_enabled: false
+
+ios_test_delay: 1
+ios_genie_generic_command: show version
+
+ios_bgp_as: 10
+ios_bgp_peers: 
+  - 2.2.2.2
+
+ios_bgp_networks: 
+  - prefix: 9.9.9.9
+    masklen: 32
