@@ -2,9 +2,6 @@
 
 - hosts: localhost
   remote_user: root
-  pre_tasks:
-    - include_role: 
-      name: clay584.parse_genie
   roles:
     - ansible-role-ios_router
   
